@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>br.com.ecommerce</groupId>
-	<artifactId>ecommerce-testes</artifactId>
+	<groupId>br.com.buggie4</groupId>
+	<artifactId>buggie4-testes</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>ecommerce-testes</name>
+	<name>buggie4-testes</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
