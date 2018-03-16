@@ -17,7 +17,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry excluding="**|br/com/ecommerce/" kind="src" output="target/test-classes" path="src/test/resources">
+	<classpathentry excluding="**|br/com/buggie/" kind="src" output="target/test-classes" path="src/test/resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
@@ -27,6 +27,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="src/test/resources/br/com/ecommerce"/>
+	<classpathentry kind="lib" path="src/test/resources/br/com/buggie"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
