@@ -12,7 +12,10 @@ import org.openqa.selenium.WebDriver;
 import br.com.buggie.config.setup.Property;
 import br.com.buggie.config.setup.Selenium;
 import br.com.buggie.config.util.Utils;
-import br.com.buggie.fractal.testes.banco.TesteManterBancos_IT;
+import br.com.buggie.fractal.testes.banco.TesteManterBanco_IT;
+import br.com.buggie.fractal.testes.cliente.TesteManterCliente_IT;
+import br.com.buggie.fractal.testes.conta.TesteManterConta_IT;
+import br.com.buggie.fractal.testes.funcionario.TesteManterFuncionario_IT;
 
 /**
  * Classe que agrupa todas as classes de teste, funcionando com uma suíte de regressão.
@@ -21,7 +24,10 @@ import br.com.buggie.fractal.testes.banco.TesteManterBancos_IT;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	TesteManterBancos_IT.class
+	TesteManterBanco_IT.class,
+	TesteManterCliente_IT.class,
+	TesteManterConta_IT.class,
+	TesteManterFuncionario_IT.class
 })
 
 public class AllTests {

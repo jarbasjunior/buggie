@@ -28,8 +28,8 @@ import br.com.buggie.config.util.Utils;
 public abstract class PageObjectGeneric<T> {
 
 	private static final String URL                              = Property.URL_BUGGIE4;
-	private static final int    LOAD_TIMEOUT                     = 20;
-	private static final int    INTERVALO_VERIFICACAO            = 2;
+	private static final int    LOAD_TIMEOUT                     = 10;
+	private static final int    INTERVALO_VERIFICACAO            = 1;
 	private String windowHandleJanelaInicial;
 	private static final Wait<WebDriver> wait = new FluentWait<WebDriver>(Selenium.getDriver())
 				    								.withTimeout( LOAD_TIMEOUT         , TimeUnit.SECONDS) // Tempo limite (segundos)
@@ -96,11 +96,22 @@ public abstract class PageObjectGeneric<T> {
 		}
 	}
 
-	public String getValorAtributo(WebElement element) {
+	public String getTextAtributoElement(WebElement element) {
 		try {
-			return element.getAttribute("value");
+			String s = element.getAttribute("value"); 
+			return s;
 		} catch (Exception e) {
-			erroGetValorAtributo(element);
+			erroGetTextAtributo(element);
+			return null;
+		}
+	}
+	
+	public String getTextElement(WebElement element) {
+		try {
+			String s = element.getText(); 
+			return s;
+		} catch (Exception e) {
+			erroGetText(element);
 			return null;
 		}
 	}
@@ -150,7 +161,6 @@ public abstract class PageObjectGeneric<T> {
 			new Select(element).selectByVisibleText(textVisible);
 		}catch(NoSuchElementException e){
 			erroSelecaoCombo(element, textVisible);
-			Utils.takeScreenshot("SelecionarComboTexto");
 		}
 	}
 	
@@ -159,7 +169,6 @@ public abstract class PageObjectGeneric<T> {
 			new Select(element).selectByValue(valueVisible);
 		}catch(NoSuchElementException e){
 			erroSelecaoCombo(element, valueVisible);
-			Utils.takeScreenshot("SelecionarComboValue");
 		}
 	}
 	public void clicarBotaoDireito(WebElement elemento) {
@@ -210,50 +219,39 @@ public abstract class PageObjectGeneric<T> {
 		this.windowHandleJanelaInicial = windowHandleJanelaInicial;
 	}
 
-	public void selecionarFrameID(int idFrame) {
-		Selenium.getDriver().switchTo().frame(idFrame);
-	}
-	
-	public void selecionarFrameNameOrID(String stringFrame) {
-		Selenium.getDriver().switchTo().frame(stringFrame);
-	}
-	
-	public void selecionarFrameWebElement(WebElement element) {
-		Selenium.getDriver().switchTo().frame(element);
-	}
-	
-	public void retornarFramePai() {
-		Selenium.getDriver().switchTo().defaultContent();
-	}
-
-
 	public WebElement getElement(By by) {
 		return Selenium.getDriver().findElement(by);
 	}
 	
 	public void erroPreenchimento(WebElement element, String value) {
 		erro();
-		Log.erro("["+element+"] não encontrado, valor ["+value+"] não pôde ser preenchido.");
-		Assert.fail("["+element+"] não encontrado, valor ["+value+"] não pôde ser preenchido.");
+		Log.erro(element.toString().substring(45, element.toString().length()-2)+"]. não encontrado, valor ["+value+"] não pôde ser preenchido.");
+		Assert.fail(element.toString().substring(45, element.toString().length()-2)+"]. não encontrado, valor ["+value+"] não pôde ser preenchido.");
 		
 	}
 	
 	public void erroEspera(WebElement element) {
 		erro();
-		Log.erro("Tempo excedido para aguardar elemento: " + element);
-		Assert.fail("Tempo excedido para aguardar elemento: " + element);
+		Log.erro("Tempo excedido ("+LOAD_TIMEOUT+"s) para aguardar elemento: "+element.toString().substring(45, element.toString().length()-1)+"");
+		Assert.fail("Tempo excedido ("+LOAD_TIMEOUT+"s) para aguardar elemento: "+element.toString().substring(45, element.toString().length()-1)+"");
 	}
 	
 	public void erroClick(WebElement element) {
 		erro();
-		Log.erro("Erro ao clicar no elemento ["+element+"].");
-		Assert.fail("Erro ao clicar no elemento ["+element+"].");
+		Log.erro("Erro ao clicar no elemento: "+element.toString().substring(45, element.toString().length()-2)+"].");
+		Assert.fail("Erro ao clicar no elemento "+element.toString().substring(45, element.toString().length()-2)+"].");
 	}
 	
-	public void erroGetValorAtributo(WebElement element) {
+	public void erroGetTextAtributo(WebElement element) {
 		erro();
-		Log.erro("Erro ao buscar valor de atributo do elemento ["+element+"].");
-		Assert.fail("Erro ao buscar valor de atributo do elemento ["+element+"].");
+		Log.erro("Erro ao buscar texto de atributo do elemento: "+element.toString().substring(45, element.toString().length()-2)+"].");
+		Assert.fail("Erro ao buscar texto de atributo do elemento: "+element.toString().substring(45, element.toString().length()-2)+"].");
+	}
+	
+	public void erroGetText(WebElement element) {
+		erro();
+		Log.erro("Erro ao buscar texto do elemento: "+element.toString().substring(45, element.toString().length()-2)+"].");
+		Assert.fail("Erro ao buscar texto do elemento: "+element.toString().substring(45, element.toString().length()-2)+"].");
 	}
 	
 	public void erroConfirmaAlerta() {
@@ -262,13 +260,32 @@ public abstract class PageObjectGeneric<T> {
 		Assert.fail("Erro ao realizar a confirmacao do Alerta");
 	}
 	
+	public void errogetText() {
+		erro();
+		Log.erro("Erro ao realizar a confirmacao do Alerta");
+		Assert.fail("Erro ao realizar a confirmacao do Alerta");
+	}
+	
 	public void erroSelecaoCombo(WebElement element, String valor) {
 		erro();
-		Log.erro("Erro na seleção do combo");
-		Assert.fail("Erro ao selecionar no elemento: ["+element.getTagName()+ "] com o valor: "+valor);
+		Log.erro("Erro ao selecionar elemento do combo: "+element.toString().substring(45, element.toString().length()-2)+"], com o valor: "+valor);
+		Utils.takeScreenshot("Combobox-"+valor);
+		Assert.fail("Erro ao selecionar elemento do combo: "+element.toString().substring(45, element.toString().length()-2)+"], com o valor: "+valor);
 	}
 	
 	public void erro() {
 		Log.erro("E R R O ...");
+		isPageNotExists();
+	}
+	
+	public void isPageNotExists() {
+		boolean isPageNotExists = Selenium.getDriver().getTitle().toString().equals("The page you were looking for doesn't exist (404)");
+		if (isPageNotExists) {
+			Log.erro("A PÁGINA PROCURADA NÃO EXISTE ! ! !");
+			Utils.takeScreenshot("Not found-404!");
+			Selenium.getDriver().navigate().to(Property.URL_BUGGIE4);
+			Utils.wait(1000);
+			Assert.fail("A PÁGINA PROCURADA NÃO EXISTE ! ! !");
+		}
 	}
 }

@@ -34,28 +34,39 @@ public class PageIncluirBanco extends PageObjectGeneric<PageIncluirBanco> {
 	WebElement fieldName;
 	
 	@FindBy(xpath = "//*[@id='toast-container']/div/div")
-	WebElement msgSucesso;
+	WebElement msgFeedback;
 	
-	public void incluirBanco(String banco) {
+	public void incluirBancoSucesso(String banco) {
 		aguardarElementoVisivel(titleRegistroNovoBanco);
-		validarOrtografiaPageHomeBanco();
+		validarOrtografiaPageIncluirBanco();
 		
 		Log.info("Cadastrando banco ["+banco+"]...");
 		preencherCampo(fieldName, banco);
 		Log.info("Salvando registro ["+banco+"]...");
 		waitAndClick(btSalvar);
 		Log.info("Validando mensagem de feedback de sucesso...");
-		Utils.assertEquals(msgSucesso.getText(), "Registro incluído com sucesso!");
+		Utils.assertEquals(msgFeedback.getText(), "Registro incluído com sucesso!");
 		Log.info("Mensagem de feedback de sucesso validada");
 	}
 	
-	public void validarOrtografiaPageHomeBanco() {
+	public void incluirBancoSemPreencherCampoNome() {
+		aguardarElementoVisivel(titleRegistroNovoBanco);
+		validarOrtografiaPageIncluirBanco();
+		
+		Log.info("Salvando banco com campo [Nome] vazio...");
+		waitAndClick(btSalvar);
+		Log.info("Validando mensagem de feedback de erro...");
+		Utils.assertEquals(getTextElement(msgFeedback), "Não foi possível concluir o registro, corrija os erros e tente novamente.");
+		Log.info("Mensagem de feedback de sucesso validada");
+	}
+	
+	public void validarOrtografiaPageIncluirBanco() {
 		Log.info("Verificando ortografia da página de inclusão de banco...");
-		Utils.assertEquals(titleRegistroNovoBanco.getText() , "Registro de Novos Bancos");
-		Utils.assertEquals(titleIdentificacaoBanco.getText(), "Identificação do Banco");
-		Utils.assertEquals(titleNome.getText()              , "Nome");
-		Utils.assertEquals(btSalvar.getAttribute("value")   , "Salvar");
-		Utils.assertEquals(btCancelar.getText()             , "Cancelar");
+		Utils.assertEquals(getTextElement(titleRegistroNovoBanco) , "Registro de Novos Bancos");
+		Utils.assertEquals(getTextElement(titleIdentificacaoBanco), "Identificação do Banco");
+		Utils.assertEquals(getTextElement(titleNome)              , "Nome");
+		Utils.assertEquals(getTextAtributoElement(btSalvar)       , "Salvar");
+		Utils.assertEquals(getTextElement(btCancelar)             , "Cancelar");
 		Log.info("Ortografia da página de inclusão de banco validada com sucesso.");
 	}
 }
