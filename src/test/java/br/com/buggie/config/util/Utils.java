@@ -18,8 +18,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import org.junit.Assert;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 
 import com.github.javafaker.Faker;
 
@@ -49,14 +47,17 @@ public abstract class Utils {
 			isError = !esperado.toString().equals(atual.toString());
 			Assert.assertEquals(esperado, atual);
 		} catch (Exception e) {
-			takeScreenshot("Esperava-se: ["+esperado+"]E retornou.: ["+atual+"]");
+			takeScreenshot(esperado.toString()+"#"+atual.toString());
 			assertFail("Erro encontrado: Esperado ["+esperado+"], mas retornou ["+atual+"]");
 		}finally{
 			if (isError) {
+				Log.info("    ||");
+				Log.info("   \\  /");
+				Log.info("    **");
 				Log.erro("E R R O . . .");
 				Log.erro("Esperava-se: ["+esperado+"]");
 				Log.erro("E retornou.: ["+atual+"]");
-				takeScreenshot("Esperava-se: ["+esperado+"]E retornou.: ["+atual+"]");
+				takeScreenshot(removeCaracterEspecial(esperado.toString())+"#"+removeCaracterEspecial(atual.toString()));
 			}else{
 				Log.info("Resultado esperado..: ["+esperado+"]");
 				Log.info("Resultado encontrado: ["+atual+"]");
@@ -69,12 +70,13 @@ public abstract class Utils {
 			isError = !bol;
 			Assert.assertTrue(message, bol);
 		} catch (Exception e) {
-			takeScreenshot(message);
+			takeScreenshot(removeCaracterEspecial(message));
 			assertFail(message);
 		}finally{
 			if (isError) {
 				Log.erro("E R R O . . .");
 				Log.erro(message);
+				takeScreenshot(removeCaracterEspecial(message));
 			}
 		}
 	}
@@ -112,23 +114,6 @@ public abstract class Utils {
 		return sb.toString();    
 	}
 	
-	public static int geraNumeroEntreIntervalo(int min, int max){
-		Random random = new Random();
-		return random.nextInt((max - min) + 1) + min;
-	}
-	
-	public static String geraNumeroEntre1_99(){
-		return converteInteiroParaString(geraNumeroEntreIntervalo(1, 99));
-	}
-	
-	public static String geraNumeroEntre100_999(){
-		return converteInteiroParaString(geraNumeroEntreIntervalo(100, 999));
-	}
-	
-	public static String geraNumeroEntre1000_10000(){
-		return converteInteiroParaString(geraNumeroEntreIntervalo(1000, 10000));
-	}
-	
 	public static String converteInteiroParaString(int numero){
 		return Integer.toString(numero);
 	}
@@ -137,26 +122,34 @@ public abstract class Utils {
 		return Integer.parseInt(str);
 	}
 	
+	public static String removeCaracterEspecial(String s) {
+		s = s.replace(":", "");
+		s = s.replace(";", "");
+		s = s.replace("/", "");
+		s = s.replace("\\", "");
+		s = s.replace("ç", "c");
+		s = s.replace("{", "c");
+		s = s.replace("}", "c");
+		s = s.replace("[", "c");
+		s = s.replace("]", "c");
+		return s;
+	}
+	
 	public static void takeScreenshot(String fileName){
 		Date data = new Date();
 		
-	    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd hh mm ss a");
-    	Calendar now = Calendar.getInstance();
+	    SimpleDateFormat formatter = new SimpleDateFormat("ddMMyy hh mm ss a");
         Robot robot;
 		try {
 			robot = new Robot();
          	BufferedImage screenShot = robot.createScreenCapture(new java.awt.Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
          	try {
-				ImageIO.write(screenShot, "JPG", new File(Property.EVIDENCIAS_TESTE_PATH+fileName+ data.getTime()));
+				ImageIO.write(screenShot, "png", new File(Property.EVIDENCIAS_TESTE_PATH+fileName+ "_"+formatter.format(data)+".png"));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.erro("Erro ao fotografar bug em tela");
 			}
-         	System.out.println(formatter.format(now.getTime()));
-				
 		} catch (AWTException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.erro("Erro ao fotografar bug em tela");
 		}
 	}
 	
@@ -206,50 +199,32 @@ public abstract class Utils {
 		return fake.company().name();
 	}
 	
+	public static String geraNomePortador() {
+		Faker fake = new Faker();
+		return fake.name().firstName()+" "+fake.name().lastName();
+	}
+	
 	public static String geraNomeBanco(){
 		Faker fake = new Faker();
 		return fake.business().creditCardType().toUpperCase();
 	}
 	
-	public static String geraCategoria(){
+	public static String geraNumeroConta(){
 		Faker fake = new Faker();
-		return fake.lorem().characters(4, true).toUpperCase();
+		return fake.number().digits(5);
 	}
 	
-	public static String geraCNPJ(){
+	public static String geraNumeroAgencia(){
 		Faker fake = new Faker();
-		StringBuilder sb = new StringBuilder(fake.number().digits(14));
-		sb.insert(2 , ".");
-		sb.insert(6 , ".");
-		sb.insert(10, "/");
-		sb.insert(15, "-");
-		return sb.toString();
+		return fake.number().digits(4);
 	}
 	
-	public static String geraEmail(){
+	public static String geraSaldoAtual(){
 		Faker fake = new Faker();
-		return fake.internet().emailAddress();
-	}
-	
-	public static void scrollDown(WebElement e){
-		for (int i = 0; i < 5; i++) {
-			e.sendKeys(Keys.PAGE_DOWN);
-		}
-		wait(1000);
-	}
-	
-	public static String geraTelefone(){
-		Faker fake = new Faker();
-		return fake.phoneNumber().phoneNumber();
-	}
-	
-	public static String geraEndereco(){
-		Faker fake = new Faker();
-		return fake.address().streetName()    +", "+
-			   fake.address().buildingNumber()+", "+
-		       fake.address().city()          +"-"+
-			   fake.address().stateAbbr()     +", "+
-		       fake.address().country();
+		StringBuilder sb = new StringBuilder(fake.number().digits(2));
+		sb.insert(0 , fake.number().randomDigitNotZero());
+		sb.insert(3 , ",");
+		return sb.toString() + "00";
 	}
 	
 	public static void calculaTempoDoTest(Date tempoInicio, Date tempoFinal) {

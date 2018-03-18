@@ -1,5 +1,6 @@
 package br.com.buggie.fractal.pages.banco;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -36,23 +37,44 @@ public class PageHomeBanco extends PageObjectGeneric<PageHomeBanco> {
 	@FindBy(xpath = "//*[@class='last next']/a")
 	WebElement btUltimo;
 	
+	@FindBy(xpath = "//*[@id='page-wrapper']//./tr[1]/td[2]")
+	WebElement firstRegistro;
+	
 	public void navegarParaPaginaDeInclusaoDeBanco() {
 		aguardarElementoVisivel(titleBanco);
-		validarOrtografiaPageHomeBanco();
+		validarOrtografiaPageHomeBancos();
 		Log.info("Navegando para página de inclusão de banco...");
 		waitAndClick(btCadastrarNovo);
 	}
 	
-	public void validarOrtografiaPageHomeBanco() {
+	public void navegarParaPaginaDeVisualizacaoDeBanco(String banco) {
+		aguardarElementoVisivel(titleBanco);
+		validarOrtografiaPageHomeBancos();
+		Log.info("Navegando para página de visualização de banco...");
+		By xpathBanco = By.xpath("//*[@id='page-wrapper']//./td[text()='"+banco+"']//../td[3]");
+		waitAndClick(Selenium.getDriver().findElement(xpathBanco));
+	}
+	
+	public String capturarNomePrimeiroRegistro() {
+		aguardarElementoVisivel(titleBanco);
+		validarOrtografiaPageHomeBancos();
+		Log.info("Capturando nome do primeiro registro do tipo banco na tela...");
+		String banco = firstRegistro.getText().trim();
+		Log.info("Nome encontrado no primeiro registro ["+banco+"].");
+		return banco;
+	}
+	
+	public void validarOrtografiaPageHomeBancos() {
+		Utils.wait(1000);
 		aguardarElementoVisivel(titleBanco);
 		Log.info("Verificando ortografia de page home banco...");
-		Utils.assertEquals(titleBanco.getText().substring(0, 6).trim(), "Bancos");
-		Utils.assertEquals(titleNome.getText()                        , "Nome");
-		Utils.assertEquals(titleAcoes.getText()                       , "Ações");
-		Utils.assertEquals(btCadastrarNovo.getText()                  , "Cadastrar Novo");
-		Utils.assertEquals(btPesquisar.getAttribute("value")          , "Pesquisar");
-		Utils.assertEquals(btProximo.getText()                        , "Próximo ›");
-		Utils.assertEquals(btUltimo.getText()                         , "Último »");
+		Utils.assertEquals(getTextElement(titleBanco).substring(0, 6).trim(), "Bancos");
+		Utils.assertEquals(getTextElement(titleNome)                        , "Nome");
+		Utils.assertEquals(getTextElement(titleAcoes)                       , "Ações");
+		Utils.assertEquals(getTextElement(btCadastrarNovo)                  , "Cadastrar Novo");
+		Utils.assertEquals(getTextAtributoElement(btPesquisar)              , "Pesquisar");
+		Utils.assertEquals(getTextElement(btProximo)                        , "Próximo ›");
+		Utils.assertEquals(getTextElement(btUltimo)                         , "Último »");
 		Log.info("Ortografia de page home banco validada com sucesso.");
 	}
 }
